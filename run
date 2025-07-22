@@ -29,7 +29,7 @@ execute() {
 	"$@"
 }
 
-echo "$script_dir -- $filter"
+log "$script_dir -- $filter"
 
 cd $script_dir
 scripts=$(find ./runs -maxdepth 1 -mindepth 1 -executable -type f)
