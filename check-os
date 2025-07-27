@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Define the folder to process
+TARGET_FOLDER="$HOME/personal/dev-setup/runs" # <--- IMPORTANT: Change this to your actual folder path
+
+# Define the placeholder value to be replaced
+PLACEHOLDER_VALUE=" apt " # <--- IMPORTANT: Change this to your placeholder
+
+# Variable to control dry run mode
+DRY_RUN=false
+
+# --- Argument Parsing ---
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        -d|--dry-run)
+            DRY_RUN=true
+            echo "Dry run mode enabled. No files will be modified."
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Usage: $0 [-d|--dry-run]"
+            exit 1
+            ;;
+    esac
+done
+
+# Determine the Linux distribution
+PACKAGE_MANAGER=""
+
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    if [[ "$ID" == "ubuntu" ]]; then
+        PACKAGE_MANAGER=" apt "
+    elif [[ "$ID" == "fedora" ]]; then
+        PACKAGE_MANAGER=" dnf "
+    else
+        echo "Unsupported Linux distribution: $ID. Exiting."
+        exit 1
+    fi
+else
+    echo "Could not determine Linux distribution. /etc/os-release not found. Exiting."
+    exit 1
+fi
+
+echo "Detected Linux distribution: $ID. Using package manager: $PACKAGE_MANAGER"
+
+# Check if the target folder exists
+if [ ! -d "$TARGET_FOLDER" ]; then
+    echo "Error: Target folder '$TARGET_FOLDER' does not exist."
+    exit 1
+fi
+
+# Go through all files in the specific folder and replace the placeholder
+echo "Processing files in '$TARGET_FOLDER'..."
+for file in "$TARGET_FOLDER"/*; do
+    if [ -f "$file" ]; then
+        echo "Checking file: $file"
+
+        # Use grep to check if the placeholder exists in the file
+        if grep -q "$PLACEHOLDER_VALUE" "$file"; then
+            if "$DRY_RUN"; then
+                echo "  [DRY RUN] Would replace '$PLACEHOLDER_VALUE' with '$PACKAGE_MANAGER' in $file"
+                # Optionally, show the diff in dry run
+                # sed "s/$PLACEHOLDER_VALUE/$PACKAGE_MANAGER/g" "$file" | diff -u "$file" -
+            else
+                # Actual replacement using sed
+                sed -i "s/$PLACEHOLDER_VALUE/$PACKAGE_MANAGER/g" "$file"
+                if [ $? -eq 0 ]; then
+                    echo "  Successfully replaced '$PLACEHOLDER_VALUE' with '$PACKAGE_MANAGER' in $file"
+                else
+                    echo "  Error replacing placeholder in $file"
+                fi
+            fi
+        else
+            echo "  Placeholder '$PLACEHOLDER_VALUE' not found in $file. Skipping."
+        fi
+    fi
+done
+
+echo "Script finished."
