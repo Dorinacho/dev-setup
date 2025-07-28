@@ -4,7 +4,7 @@
 TARGET_FOLDER="$HOME/personal/dev-setup/runs" # <--- IMPORTANT: Change this to your actual folder path
 
 # Define the placeholder value to be replaced
-PLACEHOLDER_VALUE=" apt " # <--- IMPORTANT: Change this to your placeholder
+PLACEHOLDER_VALUE=" dnf " # <--- IMPORTANT: Change this to your placeholder
 
 # Variable to control dry run mode
 DRY_RUN=false
