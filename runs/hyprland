@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
-sudo dnf install hyprland hypridle waybar swaync hyprpaper fontawesome-fonts-all 
+sudo dnf install hyprland hypridle waybar swaync hyprpaper fontawesome-fonts-all hyprshot
 sudo dnf install wayland-devel wayland-protocols-devel hyprlang-devel pango-devel cairo-devel file-devel libglvnd-devel libglvnd-core-devel libjpeg-turbo-devel libwebp-devel libjxl-devel gcc-c++ hyprutils-devel hyprwayland-scanner
 
+git clone https://github.com/Gustash/hyprshot.git $HOME/personal/hyprshot
+ln -s $HOME/personal/hyprshot/hyprshot $HOME/.local/bin
+chmod +x $HOME/personal/hyprshot/hyprshot
+
+sudo dnf install -y swaync
+
+git clone https://github.com/hyprwm/hyprlock.git $HOME/personal/hyprlock
+cd $HOME/personal/hyprlock
+cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -S . -B ./build
+cmake --build ./build --config Release --target hyprlock -j`nproc 2>/dev/null || getconf _NPROCESSORS_CONF`
